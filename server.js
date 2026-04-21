@@ -1,3 +1,19 @@
+import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
+import cohere from "cohere-ai";
+import Groq from "groq-sdk";
+import Cerebras from "@cerebras/cerebras_cloud_sdk";
+
+dotenv.config();
+
+const app = express();
+
+app.use(cors());
+app.use(express.json());
+
+// Servir web
+app.use(express.static("."));
 app.post("/chat", async (req, res) => {
   const { message } = req.body;
 
