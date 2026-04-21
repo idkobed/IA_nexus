@@ -58,12 +58,11 @@ app.post("/chat", async (req, res) => {
         const response = await cohere.generate({
           model: "command",
           prompt: `${SYSTEM_PROMPT}\nUsuario: ${message}\nNEXUS:`,
-          max_tokens: 300,
-          temperature: 0.5
+          max_tokens: 300
         });
 
         return res.json({
-          reply: response.body.generations[0].text,
+          reply: response.generations[0].text, // 🔥 FIX AQUÍ
           source: "COHERE"
         });
 
