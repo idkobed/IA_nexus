@@ -5,8 +5,6 @@ import cohere from "cohere-ai";
 import Groq from "groq-sdk";
 import Cerebras from "@cerebras/cerebras_cloud_sdk";
 
-dotenv.config();
-
 const app = express();
 
 app.use(cors());
