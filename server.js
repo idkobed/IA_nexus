@@ -39,8 +39,7 @@ app.post("/chat", async (req, res) => {
 
   if (!message) {
     return res.json({
-      reply: "⚠️ No se recibió ninguna consulta.",
-      source: "SYSTEM"
+      reply: "⚠️ No se recibió ninguna consulta."
     });
   }
 
@@ -58,8 +57,7 @@ app.post("/chat", async (req, res) => {
     });
 
     return res.json({
-      reply: completion.choices[0].message.content,
-      source: "GROQ"
+      reply: completion.choices[0].message.content
     });
 
   } catch (error1) {
@@ -79,14 +77,13 @@ app.post("/chat", async (req, res) => {
       });
 
       return res.json({
-        reply: completion.choices[0].message.content,
-        source: "CEREBRAS"
+        reply: completion.choices[0].message.content
       });
 
     } catch (error2) {
       console.log("⚠️ CEREBRAS ERROR:", error2.message);
 
-      // 🔵 COHERE (FIX REAL AQUÍ)
+      // 🔵 COHERE
       try {
         console.log("🔵 COHERE");
 
@@ -97,16 +94,14 @@ app.post("/chat", async (req, res) => {
         });
 
         return res.json({
-          reply: response.generations[0].text,
-          source: "COHERE"
+          reply: response.generations[0].text
         });
 
       } catch (error3) {
         console.log("⚠️ COHERE ERROR:", error3.message);
 
         return res.json({
-          reply: "Sistema en modo offline.",
-          source: "OFFLINE"
+          reply: "Sistema en modo offline."
         });
       }
     }
