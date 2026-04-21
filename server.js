@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import cohere from "cohere-ai";
+import { CohereClient } from "cohere-ai";
 import Groq from "groq-sdk";
 import Cerebras from "@cerebras/cerebras_cloud_sdk";
 
@@ -22,14 +22,16 @@ const cerebras = new Cerebras({
   apiKey: process.env.CEREBRAS_API_KEY
 });
 
-if (process.env.COHERE_API_KEY) {
-  cohere.init(process.env.COHERE_API_KEY);
-}
+const cohere = new CohereClient({
+  token: process.env.COHERE_API_KEY
+});
 
 // 🔥 PROMPT
 const SYSTEM_PROMPT = `
 Eres NEXUS, experto en almacenamiento, hardware y arquitectura.
-Responde de forma clara, profesional y educativa, no respondas tablas o temas fueras de arquitectura de computadores.
+Responde de forma clara, profesional y educativa.
+No uses tablas.
+No respondas temas fuera de arquitectura de computadores.
 `;
 
 app.post("/chat", async (req, res) => {
@@ -84,7 +86,7 @@ app.post("/chat", async (req, res) => {
     } catch (error2) {
       console.log("⚠️ CEREBRAS ERROR:", error2.message);
 
-      // 🔵 COHERE
+      // 🔵 COHERE (FIX REAL AQUÍ)
       try {
         console.log("🔵 COHERE");
 
@@ -95,7 +97,7 @@ app.post("/chat", async (req, res) => {
         });
 
         return res.json({
-          reply: response.body.generations[0].text,
+          reply: response.generations[0].text,
           source: "COHERE"
         });
 
@@ -111,7 +113,7 @@ app.post("/chat", async (req, res) => {
   }
 });
 
-// 🔥 PUERTO RENDER
+// 🔥 PUERTO (IMPORTANTE PARA RENDER)
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
