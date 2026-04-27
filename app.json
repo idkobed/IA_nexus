@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "extra": {
+      "eas": {
+        "projectId": "aef3cc44-3e8d-49f1-bc93-daf488ae9daa"
+      }
+    },
+    "android": {
+      "package": "com.nexus.ai"
+    }
+  }
+}
