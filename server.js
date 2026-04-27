@@ -47,26 +47,74 @@ Tu objetivo es enseñar como un profesor, no como un generador de markdown.
 app.post("/chat", async (req, res) => {
   const { message } = req.body;
 
+  if (!message) {
+    return res.json({
+      reply: "⚠️ No se recibió ninguna consulta."
+    });
+  }
+
+  // 🟢 GROQ
   try {
-    const completion = await cerebras.chat.completions.create({
+    console.log("🟢 GROQ");
+
+    const completion = await groq.chat.completions.create({
       messages: [
-        { role: "system", content: "Eres un experto en tecnología" },
+        { role: "system", content: SYSTEM_PROMPT },
         { role: "user", content: message }
       ],
-      model: "llama3.1-8b",
-      max_completion_tokens: 300
+      model: "openai/gpt-oss-20b",
+      max_tokens: 500
     });
 
     return res.json({
-      reply: completion.choices?.[0]?.message?.content || "Sin respuesta"
+      reply: completion.choices[0].message.content
     });
 
-  } catch (error) {
-    console.log("❌ CEREBRAS ERROR:", error);
+  } catch (error1) {
+    console.log("⚠️ GROQ ERROR:", error1.message);
 
-    return res.json({
-      reply: "Error Cerebras: " + error.message
-    });
+    // 🟡 CEREBRAS
+    try {
+      console.log("🟡 CEREBRAS");
+
+      const completion = await cerebras.chat.completions.create({
+        messages: [
+          { role: "system", content: SYSTEM_PROMPT },
+          { role: "user", content: message }
+        ],
+        model: "llama3.1-8b",
+        max_completion_tokens: 500
+      });
+
+      return res.json({
+        reply: completion.choices[0].message.content
+      });
+
+    } catch (error2) {
+      console.log("⚠️ CEREBRAS ERROR:", error2.message);
+
+      // 🔵 COHERE
+      try {
+        console.log("🔵 COHERE");
+
+        const response = await cohere.generate({
+          model: "command",
+          prompt: `${SYSTEM_PROMPT}\nUsuario: ${message}\nNEXUS:`,
+          max_tokens: 500
+        });
+
+        return res.json({
+          reply: response.generations[0].text
+        });
+
+      } catch (error3) {
+        console.log("⚠️ COHERE ERROR:", error3.message);
+
+        return res.json({
+          reply: "Sistema en modo offline."
+        });
+      }
+    }
   }
 });
 
